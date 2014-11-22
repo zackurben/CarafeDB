@@ -3,7 +3,7 @@
  * This project is licensed under the terms of the MIT license,
  * you can read more in the LICENSE file.
  *
- * @file    /Carafe/DB.php.
+ * @file    lib/zackurben/Carafe/DB.php.
  * @version 0.0.0
  * @github  https://github.com/zackurben/CarafeDB
  * @author  Zack Urben
@@ -59,7 +59,7 @@ class DB
         $results = intval($results);
         if ($results < 0) {
             throw new Exception(
-                'Error: Invalid parameter recieved: read(' . $results
+                'Error: Invalid parameter received: read(' . $results
                 . '); The given parameter must be a positive integer.'
             );
         } elseif ($results == 0) {
@@ -142,7 +142,7 @@ class DB
                 }
             } else {
                 throw new Exception(
-                    'Error: Invalid column name recieved: select('
+                    'Error: Invalid column name received: select('
                     . var_export($param, true) . '); The column '
                     . $invalid_key . ' was not found in the database: '
                     . $this->db . '.'
@@ -150,7 +150,7 @@ class DB
             }
         } else {
             throw new Exception(
-                'Error: Invalid parameter recieved: select('
+                'Error: Invalid parameter received: select('
                 . var_export($results, true)
                 . '); Must contain an array with at-least one element.'
             );
@@ -191,7 +191,7 @@ class DB
                 file_put_contents($this->db, $temp, FILE_APPEND | LOCK_EX);
             } else {
                 throw new Exception(
-                    'Error: Invalid column name recieved: insert('
+                    'Error: Invalid column name received: insert('
                     . var_export($row, true) . '); The column '
                     . $invalid_key . ' was not found in the database: '
                     . $this->db . '.'
@@ -199,7 +199,7 @@ class DB
             }
         } else {
             throw new Exception(
-                'Error: Invalid parameter recieved: select('
+                'Error: Invalid parameter received: select('
                 . var_export($results, true)
                 . '); Must contain an array with at-least one element.'
             );
