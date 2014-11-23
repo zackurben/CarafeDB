@@ -13,12 +13,13 @@
  * data insert and selection from CarafeDB.
  */
 
-include_once dirname(__DIR__) . '/vendor/autoload.php';
+include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor'
+    . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use zackurben\Carafe\DB;
 
 // Create or load the example1 CarafeDB.
-$test = new DB('examples/example1.cdb');
+$test = new DB('examples' . DIRECTORY_SEPARATOR . 'example1.cdb');
 
 // Create some dummy data to work with.
 $rows = array(
@@ -61,6 +62,6 @@ $select = $test->select(array('id' => 1));
 if ($select) {
     echo 'Row 1 exists' . PHP_EOL . print_r($select, true) . PHP_EOL;
 } else {
-    echo 'Insert our dummy data..' . PHP_EOL;
+    echo 'Inserting our dummy data..' . PHP_EOL;
     $test->insert($rows);
 }
