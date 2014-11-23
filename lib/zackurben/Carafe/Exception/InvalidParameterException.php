@@ -55,10 +55,9 @@ class InvalidParameterException extends \Exception
      */
     public function __toString()
     {
-//        return 'Expected ' . $this->expected . ' but got ' . $this->given . '.';
         return 'exception \'InvalidParameterException\' with message \''
-        . $this->function . ' expected a parameter of type '
-        . $this->expected . ' but got a parameter of type ' . $this->given
-        . '.\'';
+            . $this->function . ' expected a parameter of type '
+            . $this->expected . ' but got a parameter of type ' . $this->given
+            . '.\'';
     }
 }

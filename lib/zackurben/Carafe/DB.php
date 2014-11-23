@@ -12,8 +12,8 @@
 
 namespace zackurben\Carafe;
 
-use \Exception;
-use zackurben\Carafe\Core;
+use zackurben\Carafe\Exception\InvalidColumnException;
+use zackurben\Carafe\Exception\InvalidParameterException;
 
 /**
  * The Carafe Database implementation.
@@ -48,61 +48,49 @@ class DB extends Core
      */
     public function select(array $param)
     {
-        // Only continue with select if param list is valid.
-        if (count($param) > 0) {
-            // Confirm that each param exist as an array key.
-            $valid = true;
-            $simplex_row = $this->read(1);
-
-            foreach ($param as $key => $val) {
-                if (isset($simplex_row[0]) && !array_key_exists($key, $simplex_row[0])) {
-                    // At-least one search key did not exist, throw an error.
-                    $invalid_key = $key;
-                    $valid = false;
-                }
-            }
-
-            if ($valid) {
-                // Read each row to determine our results.
-                $all_rows = $this->read();
-                $result_rows = array();
-                foreach ($all_rows as $row) {
-                    // By default each row is a result, until proven otherwise.
-                    $result = true;
-                    foreach ($param as $key => $val) {
-                        if (($row[$key] != $val) && (stripos($val, "%") === false)) {
-                            // Value is not found and wildcard is not present.
-                            $result = false;
-                            break;
-                        } elseif (stripos($val, "%") !== false) {
-                            // Further verification because wildcard is present.
-                            $temp = str_replace("%", "", $val);
-                            if (stripos($row[$key], $temp) === false) {
-                                $result = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    // If the result is valid, add it to the result list.
-                    if ($result) {
-                        array_push($result_rows, $row);
-                    }
-                }
-            } else {
-                throw new Exception(
-                    'Error: Invalid column name received: select('
-                    . var_export($param, true) . '); The column '
-                    . $invalid_key . ' was not found in the database: '
-                    . $this->db . '.'
-                );
-            }
-        } else {
-            throw new Exception(
-                'Error: Invalid parameter received: select('
-                . var_export($param, true)
-                . '); Must contain an array with at-least one element.'
+        // Validate parameters type.
+        if (!is_array($param)) {
+            throw new InvalidParameterException(
+                'DB#select()',
+                gettype($param),
+                'array'
             );
+        }
+
+        // Validate input data.
+        $invalid_columns = $this->getInvalidColumns($param);
+        if (empty($invalid_columns)) {
+            throw new InvalidColumnException(
+                'DB#select()',
+                $invalid_columns
+            );
+        }
+
+        // Read each row to determine our results.
+        $all_rows = $this->read();
+        $result_rows = array();
+        foreach ($all_rows as $row) {
+            // By default each row is a result, until proven otherwise.
+            $result = true;
+            foreach ($param as $key => $val) {
+                if (($row[$key] != $val) && (stripos($val, "%") === false)) {
+                    // Value is not found and wildcard is not present.
+                    $result = false;
+                    break;
+                } elseif (stripos($val, "%") !== false) {
+                    // Further verification because wildcard is present.
+                    $temp = str_replace("%", "", $val);
+                    if (stripos($row[$key], $temp) === false) {
+                        $result = false;
+                        break;
+                    }
+                }
+            }
+
+            // If the result is valid, add it to the result list.
+            if ($result) {
+                array_push($result_rows, $row);
+            }
         }
 
         return $result_rows;
@@ -117,41 +105,29 @@ class DB extends Core
      */
     public function insert(array $row)
     {
-        // Only continue with insert if param list is valid.
-        if (count($row) > 0) {
-            // Confirm that each param exist as an array key.
-            $valid = true;
-            $simplex_row = $this->read(1);
-
-            foreach ($row as $key => $val) {
-                if (isset($simplex_row[0]) && !array_key_exists($key, $simplex_row[0])) {
-                    // At-least one search key did not exist, throw an error.
-                    $invalid_key = $key;
-                    $valid = false;
-                }
-            }
-
-            if ($valid) {
-                $temp = "";
-                foreach ($row as $data) {
-                    $temp .= json_encode($data) . PHP_EOL;
-                }
-
-                file_put_contents($this->db, $temp, FILE_APPEND | LOCK_EX);
-            } else {
-                throw new Exception(
-                    'Error: Invalid column name received: insert('
-                    . var_export($row, true) . '); The column '
-                    . $invalid_key . ' was not found in the database: '
-                    . $this->db . '.'
-                );
-            }
-        } else {
-            throw new Exception(
-                'Error: Invalid parameter received: select('
-                . var_export($row, true)
-                . '); Must contain an array with at-least one element.'
+        // Validate parameters type.
+        if (!is_array($row)) {
+            throw new InvalidParameterException(
+                'DB#insert()',
+                gettype($row),
+                'array'
             );
         }
+
+        // Validate input data.
+        $invalid_columns = $this->getInvalidColumns($row);
+        if (empty($invalid_columns)) {
+            throw new InvalidColumnException(
+                'DB#insert()',
+                $invalid_columns
+            );
+        }
+
+        $temp = "";
+        foreach ($row as $data) {
+            $temp .= json_encode($data) . PHP_EOL;
+        }
+
+        file_put_contents($this->db, $temp, FILE_APPEND | LOCK_EX);
     }
 }

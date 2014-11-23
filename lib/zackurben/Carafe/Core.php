@@ -12,7 +12,6 @@
 
 namespace zackurben\Carafe;
 
-use \Exception;
 use zackurben\Carafe\Exception\InvalidParameterException;
 
 class Core
@@ -40,7 +39,7 @@ class Core
         // Input validation on parameters.
         if (!is_string($file)) {
             throw new InvalidParameterException(
-                'DB#__construct($file)',
+                'DB#__construct()',
                 'string',
                 gettype($file)
             );
@@ -71,20 +70,21 @@ class Core
         // Input validation on parameters.
         if (!is_integer($results) || ($results < 0)) {
             throw new InvalidParameterException(
-                'DB#read($results)',
+                'DB#read()',
                 'integer (positive)',
                 gettype($results)
             );
         }
 
+        // Manipulate the result count if not specified to skip the break check.
         if ($results == 0) {
-            // Manipulate the results variable to skip the break check.
             $results = -1;
         }
 
         $temp = file_get_contents($this->db);
         $temp = explode(PHP_EOL, $temp);
-        // Remove the last `empty` newline element.
+
+        // Remove the last element which is empty (PHP_EOL).
         array_pop($temp);
 
         $return = array();
@@ -98,5 +98,23 @@ class Core
         }
 
         return $return;
+    }
+
+    /**
+     * Determine whether the given data is structured the same as the CarafeDB.
+     *
+     * @param array $data
+     *   The row to validate.
+     *
+     * @return array
+     *   The columns that do not match the structure of the current CarafeDB.
+     */
+    protected function getInvalidColumns(array $data)
+    {
+        // The given columns do not exist in the current CarafeDB instance.
+        $simplex_row = $this->read(1);
+        $invalid_keys = array_diff_key($data, $simplex_row);
+
+        return $invalid_keys;
     }
 }
