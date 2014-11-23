@@ -3,7 +3,7 @@
  * This project is licensed under the terms of the MIT license,
  * you can read more in the LICENSE file.
  *
- * @file    examples/example1.php.
+ * @file    examples/example2.php.
  * @version 0.0.0
  * @github  https://github.com/zackurben/CarafeDB
  * @author  Zack Urben
@@ -19,7 +19,7 @@ include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor'
 use zackurben\Carafe\DB;
 
 // Create or load the example1 CarafeDB.
-$test = new DB('examples' . DIRECTORY_SEPARATOR . 'example1.cdb');
+$test = new DB('examples' . DIRECTORY_SEPARATOR . 'example2.cdb');
 
 // Create some dummy data to work with.
 $rows = array(
@@ -60,7 +60,10 @@ $rows = array(
 // Select Row 1 if it exists or insert our dummy data.
 $select = $test->select(array('id' => 1));
 if ($select) {
-    echo 'Row 1 exists' . PHP_EOL;
+    echo 'Deleting Row 1 and 2' . PHP_EOL;
+    // Remove both rows.
+    $test->removeRow($rows[0]);
+    $test->removeRow($rows[1]);
 } else {
     echo 'Inserting Row 1 and 2' . PHP_EOL;
     $test->insert($rows);
