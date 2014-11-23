@@ -13,6 +13,7 @@
 namespace zackurben\Carafe;
 
 use \Exception;
+use zackurben\Carafe\Exception\InvalidParameterException;
 
 class Core
 {
@@ -31,9 +32,21 @@ class Core
      *
      * @param string $file
      *   String representation of the file name.
+     *
+     * @throws InvalidParameterException
      */
     public function __construct($file)
     {
+        // Input validation on parameters.
+        if (!is_string($file)) {
+            throw new InvalidParameterException(
+                'DB#__construct($file)',
+                'string',
+                gettype($file)
+            );
+        }
+
+        // Set the file path if it exists or create the file.
         if (is_file($file)) {
             $this->db = $file;
         } else {
@@ -50,16 +63,21 @@ class Core
      *
      * @return array
      *   The read results as an associative keyed array.
+     *
+     * @throws InvalidParameterException
      */
     protected function read($results = 0)
     {
-        $results = intval($results);
-        if ($results < 0) {
-            throw new Exception(
-                'Error: Invalid parameter received: read(' . $results
-                . '); The given parameter must be a positive integer.'
+        // Input validation on parameters.
+        if (!is_integer($results) || ($results < 0)) {
+            throw new InvalidParameterException(
+                'DB#read($results)',
+                'integer (positive)',
+                gettype($results)
             );
-        } elseif ($results == 0) {
+        }
+
+        if ($results == 0) {
             // Manipulate the results variable to skip the break check.
             $results = -1;
         }
